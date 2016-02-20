@@ -1,0 +1,35 @@
+name:                yesod-auth-free-account
+version:             0.1.0.0
+synopsis:            Free registration by email address.
+description:         Please see README.md
+homepage:            https://github.com/jabaraster/yesod-auth-free-account
+license:             MIT
+license-file:        LICENSE
+author:              jabaraster
+maintainer:          ah@jabara.info
+copyright:           2016 jabaraster Here
+category:            Web
+build-type:          Simple
+cabal-version:       >=1.10
+
+library
+  hs-source-dirs:      src
+  default-language:    Haskell2010
+  build-depends:       base >= 4.7 && < 5
+                     , yesod-core                    >= 1.4.17     && < 1.5
+                     , yesod-auth                    >= 1.3        && < 1.5
+                     , yesod-form                    >= 1.4.0      && < 1.5
+                     , text                          >= 0.11       && < 2.0
+                     , mtl
+                     , nonce
+                     , bytestring
+                     , persistent
+                     , yesod-persistent
+                     , pwstore-fast
+
+  exposed-modules: Yesod.Auth.FreeAccount
+                 , Yesod.Auth.FreeAccount.Message
+
+source-repository head
+  type:     git
+  location: git@github.com:jabaraster/yesod-auth-free-account.git

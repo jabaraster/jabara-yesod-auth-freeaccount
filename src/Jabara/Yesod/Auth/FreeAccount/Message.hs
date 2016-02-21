@@ -13,6 +13,7 @@ import qualified Data.Text as T
 
 -- | Messages specific to yesod-auth-account.  We also use messages from "Yesod.Auth.Message".
 data AccountMsg = MsgUsername
+                | MsgRegisterLong
                 | MsgForgotPassword
                 | MsgInvalidUsername
                 | MsgUsernameExists T.Text
@@ -27,6 +28,7 @@ defaultAccountMsg = japaneseAccountMsg
 
 japaneseAccountMsg :: AccountMsg -> T.Text
 japaneseAccountMsg MsgUsername = "ユーザー名"
+japaneseAccountMsg MsgRegisterLong = "アカウント登録はこちらから"
 japaneseAccountMsg MsgForgotPassword = "パスワードをお忘れですか？"
 japaneseAccountMsg MsgInvalidUsername = "ユーザー名が正しくありません。"
 japaneseAccountMsg (MsgUsernameExists u) = T.concat ["ユーザー名 ", u, " は既に使われているようです。他のユーザー名を入力してください。"]
@@ -37,6 +39,7 @@ japaneseAccountMsg MsgEmailUnverified = "メールアドレスが正しいかど
 
 englishAccountMsg :: AccountMsg -> T.Text
 englishAccountMsg MsgUsername = "Username"
+englishAccountMsg MsgRegisterLong = "Register a new account"
 englishAccountMsg MsgForgotPassword = "Forgot password?"
 englishAccountMsg MsgInvalidUsername = "Invalid username"
 englishAccountMsg (MsgUsernameExists u) = T.concat ["The username ", u, " already exists.  Please choose an alternate username."]

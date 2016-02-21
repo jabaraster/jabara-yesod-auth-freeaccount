@@ -296,7 +296,7 @@ loginWidget tm = do
         ^{widget}
         <input type=submit value=_{Msg.LoginTitle}>
     <p>
-        <a href="@{tm newAccountR}">_{Msg.RegisterLong}
+        <a href="@{tm newAccountR}">_{MsgRegisterLong}
         <a href="@{tm resetPasswordR}">_{MsgForgotPassword}
 |]
 
@@ -812,7 +812,7 @@ class (YesodAuth master
     getNewAccountR = do
         tm <- getRouteToParent
         lift $ defaultLayout $ do
-            setTitleI Msg.RegisterLong
+            setTitleI MsgRegisterLong
             newAccountWidget tm
 
     -- | Handles new account creation.

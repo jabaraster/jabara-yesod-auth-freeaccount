@@ -1,13 +1,13 @@
-name:                yesod-auth-free-account
+name:                jabara-yesod-auth-freeaccount
 version:             0.1.0.0
 synopsis:            Free registration by email address.
 description:         Please see README.md
-homepage:            https://github.com/jabaraster/yesod-auth-free-account
+homepage:            https://github.com/jabaraster/jabara-yesod-auth-freeaccount
 license:             MIT
 license-file:        LICENSE
 author:              jabaraster
 maintainer:          ah@jabara.info
-copyright:           2016 jabaraster Here
+copyright:           2016 jabaraster
 category:            Web
 build-type:          Simple
 cabal-version:       >=1.10
@@ -27,9 +27,9 @@ library
                      , yesod-persistent
                      , pwstore-fast
 
-  exposed-modules: Yesod.Auth.FreeAccount
-                 , Yesod.Auth.FreeAccount.Message
+  exposed-modules: Jabara.Yesod.Auth.FreeAccount
+                 , Jabara.Yesod.Auth.FreeAccount.Message
 
 source-repository head
   type:     git
-  location: git@github.com:jabaraster/yesod-auth-free-account.git
+  location: git@github.com:jabaraster/jabara-yesod-auth-freeaccount.git

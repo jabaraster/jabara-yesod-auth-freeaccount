@@ -33,7 +33,7 @@ japaneseAccountMsg MsgForgotPassword = "パスワードをお忘れですか？"
 japaneseAccountMsg MsgInvalidUsername = "ユーザー名が正しくありません。"
 japaneseAccountMsg (MsgUsernameExists u) = T.concat ["ユーザー名 ", u, " は既に使われているようです。他のユーザー名を入力してください。"]
 japaneseAccountMsg MsgResendVerifyEmail = "検証メールを再送信する"
-japaneseAccountMsg MsgResetPwdEmailSent = "パスワードリセットメールを送る。"
+japaneseAccountMsg MsgResetPwdEmailSent = "パスワードリセットメールを送りました。"
 japaneseAccountMsg MsgEmailVerified = "メールアドレスが正しいことを確認しました。"
 japaneseAccountMsg MsgEmailUnverified = "メールアドレスが正しいかどうかが、まだ確認できていません。"
 

@@ -98,28 +98,36 @@ module Jabara.Yesod.Auth.FreeAccount(
     , newVerifyKey
 ) where
 
-import GHC.Base
-import GHC.Show
-import Data.Either (Either(..))
+import           Control.Applicative
+import           Control.Monad.Reader hiding (lift)
 
-import Control.Applicative
-import Control.Monad.Reader hiding (lift)
-import Data.Char (isAlphaNum)
-import System.IO.Unsafe (unsafePerformIO)
 import qualified Crypto.PasswordStore as PS
 import qualified Crypto.Nonce as Nonce
+
+import           Data.Char (isAlphaNum)
+import           Data.Either (Either(..))
 import qualified Data.ByteString as B
 import qualified Data.Text as T
+import qualified Data.Text.IO as TI
 import qualified Data.Text.Encoding as TE
 import qualified Database.Persist as P
 
-import Yesod.Core
-import Yesod.Form
-import Yesod.Auth
-import Yesod.Persist hiding (get, replace, insertKey, Entity, entityVal)
+import           GHC.Base
+import           GHC.Show
+
+import           System.IO.Unsafe (unsafePerformIO)
+
+import           Yesod.Core
+import           Yesod.Form
+import           Yesod.Auth
+import           Yesod.Persist hiding (
+                   get, replace, insertKey, Entity, entityVal
+                 )
 import qualified Yesod.Auth.Message as Msg
 
-import Jabara.Yesod.Auth.FreeAccount.Message
+import           Jabara.Yesod.Auth.FreeAccount.Message
+
+pluginName = "free-account"
 
 -- | Each user is uniquely identified by a username.
 type Username = T.Text
@@ -213,7 +221,7 @@ type Username = T.Text
 -- >    liftIO $ warp 3000 $ MyApp pool
 --
 authFreeAccountPlugin :: YesodAuthFreeAccount db master => AuthPlugin master
-authFreeAccountPlugin = AuthPlugin "account" dispatch loginWidget
+authFreeAccountPlugin = AuthPlugin pluginName dispatch loginWidget
     where dispatch "POST" ["login"] = postLoginR >>= sendResponse
           dispatch "GET"  ["newaccount"] = getNewAccountR >>= sendResponse
           dispatch "POST" ["newaccount"] = postNewAccountR >>= sendResponse
@@ -227,40 +235,40 @@ authFreeAccountPlugin = AuthPlugin "account" dispatch loginWidget
 
 -- | The POST target for the 'loginForm'.
 loginFormPostTargetR :: AuthRoute
-loginFormPostTargetR = PluginR "account" ["login"]
+loginFormPostTargetR = PluginR pluginName ["login"]
 
 -- | Route for the default new account page.
 --
 -- See the New Account section below for customizing the new account process.
 newAccountR :: AuthRoute
-newAccountR = PluginR "account" ["newaccount"]
+newAccountR = PluginR pluginName ["newaccount"]
 
 -- | Route for the reset password page.
 --
 -- This page allows the user to reset their password by requesting an email with a
 -- reset URL be sent to them.  See the Password Reset section below for customization.
 resetPasswordR :: AuthRoute
-resetPasswordR = PluginR "account" ["resetpassword"]
+resetPasswordR = PluginR pluginName ["resetpassword"]
 
 -- | The URL sent in an email for email verification
 verifyR :: Username 
         -> T.Text -- ^ The verification key
         -> AuthRoute
-verifyR u k = PluginR "account" ["verify", u, k]
+verifyR u k = PluginR pluginName ["verify", u, k]
 
 -- | The POST target for resending a verification email
 resendVerifyR :: AuthRoute
-resendVerifyR = PluginR "account" ["resendverifyemail"]
+resendVerifyR = PluginR pluginName ["resendverifyemail"]
 
 -- | The URL sent in an email when the user requests to reset their password
 newPasswordR :: Username
              -> T.Text -- ^ The verification key
              -> AuthRoute
-newPasswordR u k = PluginR "account" ["newpassword", u, k]
+newPasswordR u k = PluginR pluginName ["newpassword", u, k]
 
 -- | The POST target for reseting the password
 setPasswordR :: AuthRoute
-setPasswordR = PluginR "account" ["setpassword"]
+setPasswordR = PluginR pluginName ["setpassword"]
 
 ---------------------------------------------------------------------------------------------------
 
@@ -322,7 +330,7 @@ postLoginR = do
             redirect LoginR
 
         Right u -> if userEmailVerified u
-                        then do lift $ setCreds True $ Creds "account" (username u) []
+                        then do lift $ setCreds True $ Creds pluginName (username u) []
                                 -- setCreds should redirect so we will never get here
                                 badMethod
                         else unregisteredLogin u
@@ -412,6 +420,8 @@ createNewAccount (NewAccountData u email pwd _) tm = do
 
     key <- newVerifyKey
     hashed <- hashPassword pwd
+    liftIO $ TI.putStrLn $ T.concat ["===== input password(in FreeAccount.hs) -> ", pwd]
+    liftIO $ B.putStrLn hashed
 
     mnew <- runAccountDB $ addNewUser u email key hashed
     new <- case mnew of
@@ -438,7 +448,7 @@ getVerifyR uname k = do
                             redirect LoginR
                         lift $ runAccountDB $ verifyAccount user
                         lift $ setMessageI MsgEmailVerified
-                        lift $ setCreds True $ Creds "account" uname []
+                        lift $ setCreds True $ Creds pluginName uname []
 
 -- | A form to allow the user to request the email validation be resent.
 --
@@ -628,9 +638,11 @@ postSetPasswordR = do
                               when (newPasswordKey d /= userResetPwdKey user) $ permissionDenied "Invalid key"
 
                               hashed <- hashPassword (newPasswordPwd1 d)
+                              liftIO $ TI.putStrLn $ T.concat ["===== input password(in FreeAccount.hs) -> ", newPasswordPwd1 d]
+                              liftIO $ B.putStrLn hashed
                               lift $ runAccountDB $ setNewPassword user hashed
                               lift $ setMessageI Msg.PassUpdated
-                              lift $ setCreds True $ Creds "account" (newPasswordUser d) []
+                              lift $ setCreds True $ Creds pluginName (newPasswordUser d) []
 
 ---------------------------------------------------------------------------------------------------
 

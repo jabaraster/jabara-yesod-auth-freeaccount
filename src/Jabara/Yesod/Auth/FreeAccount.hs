@@ -108,7 +108,6 @@ import           Data.Char (isAlphaNum)
 import           Data.Either (Either(..))
 import qualified Data.ByteString as B
 import qualified Data.Text as T
-import qualified Data.Text.IO as TI
 import qualified Data.Text.Encoding as TE
 import qualified Database.Persist as P
 
@@ -127,6 +126,7 @@ import qualified Yesod.Auth.Message as Msg
 
 import           Jabara.Yesod.Auth.FreeAccount.Message
 
+pluginName :: T.Text
 pluginName = "free-account"
 
 -- | Each user is uniquely identified by a username.
@@ -420,8 +420,6 @@ createNewAccount (NewAccountData u email pwd _) tm = do
 
     key <- newVerifyKey
     hashed <- hashPassword pwd
-    liftIO $ TI.putStrLn $ T.concat ["===== input password(in FreeAccount.hs) -> ", pwd]
-    liftIO $ B.putStrLn hashed
 
     mnew <- runAccountDB $ addNewUser u email key hashed
     new <- case mnew of
@@ -638,8 +636,6 @@ postSetPasswordR = do
                               when (newPasswordKey d /= userResetPwdKey user) $ permissionDenied "Invalid key"
 
                               hashed <- hashPassword (newPasswordPwd1 d)
-                              liftIO $ TI.putStrLn $ T.concat ["===== input password(in FreeAccount.hs) -> ", newPasswordPwd1 d]
-                              liftIO $ B.putStrLn hashed
                               lift $ runAccountDB $ setNewPassword user hashed
                               lift $ setMessageI Msg.PassUpdated
                               lift $ setCreds True $ Creds pluginName (newPasswordUser d) []
